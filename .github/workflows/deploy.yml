@@ -6,6 +6,7 @@ on:
       - dev
 env:
   MONGODB_DB_NAME: db-name
+  MONGODB_USERNAME: globalusername
 jobs:
   test:
     env:
@@ -25,13 +26,20 @@ jobs:
           key: npm-deps-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
         run: npm ci
-      - name: Run server
-        run: npm start & npx wait-on http://127.0.0.1:$PORT
-      - name: Run tests
-        run: npm test
+      - name: print env variables
+        run: |
+           echo "GITHUB_API_URL: $GITHUB_API_URL"
+           echo "GITHUB_JOB: $GITHUB_JOB"
+    #  - name: Run server
+    #    run: npm start & npx wait-on http://127.0.0.1:$PORT
+    #  - name: Run tests
+    #    run: npm test
       - name: Output information
         run: echo "MONGODB_USERNAME = ${{ env.MONGODB_USERNAME }}"
   deploy:
+    env:
+      MONGODB_CLUSTER_ADDRESS: some_address
+      MONGODB_USERNAME: deployusername
     needs: test
     runs-on: ubuntu-latest
     steps:
